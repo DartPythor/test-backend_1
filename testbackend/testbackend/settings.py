@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from decouple import config
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = (
@@ -7,6 +9,8 @@ SECRET_KEY = (
 )
 
 DEBUG = True
+
+USE_S3 = config("USE_S3", default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -17,6 +21,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "storages",
+    "projectsAPI.apps.ProjectsapiConfig",
+    "imagesAPI.apps.ImagesapiConfig",
 ]
 
 MIDDLEWARE = [
@@ -48,6 +55,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "testbackend.wsgi.application"
+
+if USE_S3:
+    AWS_ACCESS_KEY_ID = config("S3_KEY_ID", cast=str)
+    AWS_SECRET_ACCESS_KEY = config("S3_SECRET_ACCESS_KEY", cast=str)
+    AWS_STORAGE_BUCKET_NAME = config("S3_BUCKET_NAME", cast=str)
+    AWS_S3_ENDPOINT_URL = config("S3_HOST", cast=str)
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/media/"
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "testbackend.storages.StaticRootS3BotoStorage"
+else:
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
 
 DATABASES = {
     "default": {
