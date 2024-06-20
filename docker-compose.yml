@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./web
+    environment:
+      - USE_S3=True
+      - S3_KEY_ID=AKIAIOSFODNN7EXAMPLE
+      - S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      - S3_BUCKET_NAME=djangoexamples
+      - S3_HOST=http://s3ninja:9000
+    command: python testbackend/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/testbackend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - s3ninja
+
+  s3ninja:
+    image: scireum/s3-ninja:latest
+    ports:
+      - "9444:9000"
+    volumes:
+      - s3ninja_data:/data
+
+  db:
+    image: nouchka/sqlite3
+    volumes:
+      - db_data:/root/db
+    environment:
+      - SQLITE_DATABASE=your_database.db
+
+volumes:
+  s3ninja_data:
+  db_data:
