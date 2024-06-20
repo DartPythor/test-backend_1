@@ -1,6 +1,6 @@
 from django.urls import path
 
-from imagesAPI.view import ImageCreateAPI
+from imagesAPI.views import ImageCreateAPI
 
 
 app_name = "images"
