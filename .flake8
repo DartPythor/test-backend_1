@@ -1,5 +1,5 @@
 [flake8]
 import-order-style = google
 inline-quotes = "
-application-import-names = imagesAPI, projectsAPI
+application-import-names = imagesAPI, projectsAPI, testbackend
 exclude = ./venv/, ./.venv/
