@@ -3,7 +3,7 @@ from json import dumps
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class AIConsumer(AsyncWebsocketConsumer):
+class ProjectConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.project_id = self.scope["url_route"]["kwargs"]["pk"]
         self.project_group_name = f"project_id_{self.project_id}"
