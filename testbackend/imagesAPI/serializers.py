@@ -34,47 +34,65 @@ class ImageSerializers(serializers.Serializer):
         project = Project.objects.get(id=validated_data["project_id"])
         project_channel = get_channel_layer()
         group_name = f"project_id_{validated_data['project_id']}"
-
-        self.send_status(
-            project_channel,
-            group_name,
-            "init",
-            validated_data["filename"],
-        )
         image = Image.objects.create(
             project=project,
             status="init",
         )
-        self.send_status(
-            project_channel,
-            group_name,
-            "processing",
-            validated_data["filename"],
-        )
-        image.original = validated_data["image"]
-        image.thumb = resize_image(validated_data["image"], 150, 20)
-        image.big_thumb = resize_image(validated_data["image"], 700, 700)
-        image.big_1920 = resize_image(validated_data["image"], 1920, 1080)
-        image.d2500 = resize_image(validated_data["image"], 2500, 2500)
-        image.status = "uploaded"
-        self.send_status(
-            project_channel,
-            group_name,
-            "uploaded",
-            validated_data["filename"],
-        )
+        try:
+            self.send_status(
+                project_channel,
+                group_name,
+                "init",
+                validated_data["filename"],
+            )
+            self.send_status(
+                project_channel,
+                group_name,
+                "processing",
+                validated_data["filename"],
+            )
+            image.original = validated_data["image"]
+            image.thumb = resize_image(validated_data["image"], 150, 20)
+            image.big_thumb = resize_image(validated_data["image"], 700, 700)
+            image.big_1920 = resize_image(validated_data["image"], 1920, 1080)
+            image.d2500 = resize_image(validated_data["image"], 2500, 2500)
+            image.status = "uploaded"
+            image.save()
+            self.send_status(
+                project_channel,
+                group_name,
+                "uploaded",
+                validated_data["filename"],
+            )
+            image.status = "done"
+            image.save()
+            self.send_status(
+                project_channel,
+                group_name,
+                "done",
+                validated_data["filename"],
+            )
+            return {
+                "filename": validated_data["filename"],
+                "project_id": validated_data["project_id"],
+                "image": image.original,
+            }
+        except Exception as error:
+            self.send_status(
+                project_channel,
+                group_name,
+                "error",
+                validated_data["filename"],
+            )
+            image.status = "error"
+            image.save()
+            raise error
 
-        self.send_status(
-            project_channel,
-            group_name,
-            "done",
-            validated_data["filename"],
-        )
-        return {
-            "filename": validated_data["filename"],
-            "project_id": validated_data["project_id"],
-            "image": image.original,
-        }
+
+class ImageModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = "__all__"
 
 
 __all__ = ()
