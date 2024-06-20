@@ -12,9 +12,10 @@ DEBUG = True
 
 USE_S3 = config("USE_S3", default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "*"]
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,7 +55,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "testbackend.wsgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+ASGI_APPLICATION = "testbackend.asgi.application"
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = config("S3_KEY_ID", cast=str)
