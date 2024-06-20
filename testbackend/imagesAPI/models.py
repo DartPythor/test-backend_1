@@ -21,7 +21,7 @@ class Image(models.Model):
     ]
     project = models.ForeignKey(
         "projectsAPI.project",
-        related_name="project",
+        related_name="images",
         on_delete=models.CASCADE,
         default=None,
         blank=True,
