@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                         help_text="Выберите проект к которому"
                         " будет принадлежать изображение.",
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="project",
+                        related_name="images",
                         to="projectsAPI.project",
                         verbose_name="проект",
                     ),
