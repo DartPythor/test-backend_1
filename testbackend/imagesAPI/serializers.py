@@ -1,5 +1,6 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from imagesAPI.images_tools import resize_image
@@ -31,7 +32,7 @@ class ImageSerializers(serializers.Serializer):
         )
 
     def create(self, validated_data):
-        project = Project.objects.get(id=validated_data["project_id"])
+        project = get_object_or_404(Project, pk=validated_data["project_id"])
         project_channel = get_channel_layer()
         group_name = f"project_id_{validated_data['project_id']}"
         image = Image.objects.create(
